@@ -1,5 +1,4 @@
 import streamlit as st
-import pandas as pd
 import numpy as np
 import pickle
 
@@ -15,21 +14,44 @@ def load_model():
 
 model = load_model()
 
-# Tampilan form input
+# Penjelasan untuk masing-masing kolom input
+st.header('Penjelasan Kolom Input:')
+st.markdown('''
+- **Umur:** Masukkan usia pasien dalam tahun.
+- **Jenis Kelamin:** 0 = Wanita, 1 = Pria.
+- **Tipe Nyeri Dada:** 0 = ATA, 1 = NAP, 2 = ASY.
+- **Tekanan Darah Istirahat:** Tekanan darah dalam mmHg saat istirahat.
+- **Kolesterol:** Kadar kolesterol dalam mg/dL.
+- **Gula Darah Puasa:** 0 = Tidak, 1 = Ya.
+- **Resting ECG:** 0 = Normal, 1 = ST.
+- **Detak Jantung Maksimum:** Detak jantung maksimum yang dicapai.
+- **Angina Olahraga:** 0 = Tidak, 1 = Ya.
+- **Oldpeak:** Depresi ST yang disebabkan oleh olahraga relatif terhadap istirahat.
+- **ST Slope:** 0 = Up, 1 = Flat, 2 = Down.
+''')
+
+# Tampilan form input dengan kolom
 st.header('Formulir Input')
 
 with st.form(key='heart_disease_form'):
-    age = st.number_input('Umur', 1, 120, step=1)
-    sex = st.selectbox('Jenis Kelamin', [0, 1], format_func=lambda x: 'Wanita' if x == 0 else 'Pria')
-    chest_pain_type = st.selectbox('Tipe Nyeri Dada', [0, 1, 2], format_func=lambda x: 'ATA' if x == 0 else 'NAP' if x == 1 else 'ASY')
-    resting_bp = st.number_input('Tekanan Darah Istirahat', 0, 200, step=1)
-    cholesterol = st.number_input('Kolesterol', 0, 600, step=1)
-    fasting_bs = st.selectbox('Gula Darah Puasa', [0, 1], format_func=lambda x: 'Tidak' if x == 0 else 'Ya')
-    resting_ecg = st.selectbox('Resting ECG', [0, 1], format_func=lambda x: 'Normal' if x == 0 else 'ST')
-    max_hr = st.number_input('Detak Jantung Maksimum', 0, 250, step=1)
-    exercise_angina = st.selectbox('Angina Olahraga', [0, 1], format_func=lambda x: 'Tidak' if x == 0 else 'Ya')
-    oldpeak = st.number_input('Oldpeak', 0.0, 10.0, step=0.1)
-    st_slope = st.selectbox('ST Slope', [0, 1, 2], format_func=lambda x: 'Up' if x == 0 else 'Flat' if x == 1 else 'Down')
+    col1, col2, col3 = st.columns(3)
+    
+    with col1:
+        age = st.number_input('Umur', 1, 120, step=1)
+        sex = st.number_input('Jenis Kelamin (0: Wanita, 1: Pria)', 0, 1, step=1)
+        chest_pain_type = st.number_input('Tipe Nyeri Dada (0: ATA, 1: NAP, 2: ASY)', 0, 2, step=1)
+        resting_bp = st.number_input('Tekanan Darah Istirahat', 0, 200, step=1)
+        cholesterol = st.number_input('Kolesterol', 0, 600, step=1)
+    
+    with col2:
+        fasting_bs = st.number_input('Gula Darah Puasa (0: Tidak, 1: Ya)', 0, 1, step=1)
+        resting_ecg = st.number_input('Resting ECG (0: Normal, 1: ST)', 0, 1, step=1)
+        max_hr = st.number_input('Detak Jantung Maksimum', 0, 250, step=1)
+        exercise_angina = st.number_input('Angina Olahraga (0: Tidak, 1: Ya)', 0, 1, step=1)
+        oldpeak = st.number_input('Oldpeak', 0.0, 10.0, step=0.1)
+    
+    with col3:
+        st_slope = st.number_input('ST Slope (0: Up, 1: Flat, 2: Down)', 0, 2, step=1)
 
     submit_button = st.form_submit_button(label='Submit')
 

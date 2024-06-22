@@ -3,4 +3,3 @@ pandas==2.2.2
 seaborn
 scikit-learn
 matplotlib
-pickle

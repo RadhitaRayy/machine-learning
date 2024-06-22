@@ -8,29 +8,32 @@ from sklearn.metrics import accuracy_score
 import numpy as np
 import pickle
 
-# Title of the web app
-st.title('Heart Disease Prediction Web App')
+# Judul aplikasi web
+st.title('Aplikasi Prediksi Penyakit Jantung')
 
-# Sidebar for navigation
-st.sidebar.title('Navigation')
-options = st.sidebar.selectbox('Select a page:', ['Upload Data', 'EDA', 'Model Training', 'Prediction'])
+# Sidebar untuk navigasi
+st.sidebar.title('Navigasi')
+options = st.sidebar.selectbox('Pilih halaman:', ['Unggah Data', 'EDA', 'Pelatihan Model', 'Prediksi'])
 
-# Upload Data
-if options == 'Upload Data':
-    st.header('Upload Your CSV Data')
-    uploaded_file = st.file_uploader('Choose a file', type='csv')
+# Inisialisasi variabel uploaded_file
+uploaded_file = None
+
+# Unggah Data
+if options == 'Unggah Data':
+    st.header('Unggah Data CSV Anda')
+    uploaded_file = st.file_uploader('Pilih file', type='csv')
     if uploaded_file is not None:
         df = pd.read_csv(uploaded_file)
         st.write(df.head())
 
 # EDA
 if options == 'EDA':
-    st.header('Exploratory Data Analysis')
+    st.header('Analisis Data Eksploratif (EDA)')
     if uploaded_file is not None:
         df = pd.read_csv(uploaded_file)
         df.columns = df.columns.str.lower()
         
-        # Data Preprocessing
+        # Pranaproses Data
         df['sex'] = df['sex'].map({'F': 0, 'M': 1})
         df['chestpaintype'] = df['chestpaintype'].map({'ATA': 0, 'NAP': 1, 'ASY': 2})
         df['restingecg'] = df['restingecg'].map({'Normal': 0, 'ST': 1})
@@ -48,7 +51,7 @@ if options == 'EDA':
         st.pyplot(plt)
 
         # Distribusi HeartDisease
-        st.subheader('Distribusi HeartDisease')
+        st.subheader('Distribusi Penyakit Jantung')
         plt.figure(figsize=(8, 5))
         sns.countplot(x='heartdisease', data=df)
         st.pyplot(plt)
@@ -60,7 +63,7 @@ if options == 'EDA':
         for i, col in enumerate(num_columns):
             plt.subplot(2, 3, i + 1)
             sns.boxplot(x='heartdisease', y=col, data=df)
-            plt.title(f'Distribusi {col} Berdasarkan HeartDisease')
+            plt.title(f'Distribusi {col} Berdasarkan Penyakit Jantung')
         plt.tight_layout()
         st.pyplot(plt)
 
@@ -68,15 +71,17 @@ if options == 'EDA':
         st.subheader('Pairplot')
         sns.pairplot(df, hue='heartdisease', vars=num_columns)
         st.pyplot(plt)
+    else:
+        st.write("Silakan unggah file CSV terlebih dahulu di halaman 'Unggah Data'.")
 
-# Model Training
-if options == 'Model Training':
-    st.header('Model Training')
+# Pelatihan Model
+if options == 'Pelatihan Model':
+    st.header('Pelatihan Model')
     if uploaded_file is not None:
         df = pd.read_csv(uploaded_file)
         df.columns = df.columns.str.lower()
 
-        # Data Preprocessing
+        # Pranaproses Data
         df['sex'] = df['sex'].map({'F': 0, 'M': 1})
         df['chestpaintype'] = df['chestpaintype'].map({'ATA': 0, 'NAP': 1, 'ASY': 2})
         df['restingecg'] = df['restingecg'].map({'Normal': 0, 'ST': 1})
@@ -103,27 +108,29 @@ if options == 'Model Training':
         st.write(f'Akurasi data training: {training_data_accuracy}')
         st.write(f'Akurasi data testing: {test_data_accuracy}')
 
-        # Save the model
+        # Simpan model
         with open('finalized_model.sav', 'wb') as model_file:
             pickle.dump(model, model_file)
+    else:
+        st.write("Silakan unggah file CSV terlebih dahulu di halaman 'Unggah Data'.")
 
-# Prediction
-if options == 'Prediction':
-    st.header('Prediction')
+# Prediksi
+if options == 'Prediksi':
+    st.header('Prediksi')
     if uploaded_file is not None:
         model_file = 'finalized_model.sav'
-        if 'finalized_model.sav' in locals():
+        if model_file is not None:
             model = pickle.load(open(model_file, 'rb'))
 
-            age = st.number_input('Age', 1, 120, step=1)
-            sex = st.selectbox('Sex', [0, 1])
-            chest_pain_type = st.selectbox('Chest Pain Type', [0, 1, 2])
-            resting_bp = st.number_input('Resting Blood Pressure', 0, 200, step=1)
-            cholesterol = st.number_input('Cholesterol', 0, 600, step=1)
-            fasting_bs = st.selectbox('Fasting Blood Sugar', [0, 1])
+            age = st.number_input('Umur', 1, 120, step=1)
+            sex = st.selectbox('Jenis Kelamin', [0, 1])
+            chest_pain_type = st.selectbox('Tipe Nyeri Dada', [0, 1, 2])
+            resting_bp = st.number_input('Tekanan Darah Istirahat', 0, 200, step=1)
+            cholesterol = st.number_input('Kolesterol', 0, 600, step=1)
+            fasting_bs = st.selectbox('Gula Darah Puasa', [0, 1])
             resting_ecg = st.selectbox('Resting ECG', [0, 1])
-            max_hr = st.number_input('Max Heart Rate', 0, 250, step=1)
-            exercise_angina = st.selectbox('Exercise Angina', [0, 1])
+            max_hr = st.number_input('Detak Jantung Maksimum', 0, 250, step=1)
+            exercise_angina = st.selectbox('Angina Olahraga', [0, 1])
             oldpeak = st.number_input('Oldpeak', 0.0, 10.0, step=0.1)
             st_slope = st.selectbox('ST Slope', [0, 1, 2])
 
@@ -136,3 +143,5 @@ if options == 'Prediction':
                 st.write('Pasien Tidak Terkena Penyakit Jantung')
             else:
                 st.write('Pasien Terkena Penyakit Jantung')
+    else:
+        st.write("Silakan unggah file CSV terlebih dahulu di halaman 'Unggah Data'.")
